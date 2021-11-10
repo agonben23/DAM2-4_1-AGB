@@ -1,81 +1,37 @@
-class Modulo(val maxAlumnos: Int) {
+class Modulo(val maxAlumnos: Int = 20) {
+    var numAlumnosMat = 0
     var lisAlumnos= arrayOfNulls<Alumno>(maxAlumnos)
-    var lisnotas = arrayOf<Array<Int>>()
-    var lisnotas1 = listaNotas("1")
-    var lisnotas2 = listaNotas("2")
-    var lisnotas3 = listaNotas("3")
-    var lisnotas4 = listaNotas("4")
-    fun anadirAlumno(alumno: Alumno) {
-        lisAlumnos[lisAlumnos.indexOfFirst { false }] = alumno
-        lisnotas[lisnotas.indexOfFirst { false }] = alumno.notas
-    }
-
-    fun listaNotas(evaluacion: String): ArrayList<Pair<String, Int>> {
-        val notas = when (evaluacion) {
-            "1" -> obtenerCalificacion(1)
-            "2" -> obtenerCalificacion(2)
-            "3" -> obtenerCalificacion(3)
-            else -> obtenerCalificacion(4)
-        }
-        return notas
-    }
-
-    fun obtenerCalificacion(evaluacion: Int): ArrayList<Pair<String, Int>> {
-        var contadorMax = lisAlumnos.size
-        var i = 0
-        var notasEv = ArrayList<Pair<String, Int>>()
-        do {
-            var aActual = lisAlumnos[i]
-            var nombreComp = aActual?.nombre + "" + aActual?.apellidos
-            val pair = Pair(nombreComp, aActual!!.notas[evaluacion - 1])
-            notasEv.add(i, pair)
-            i++
-        } while (i != contadorMax)
-        return notasEv
-    }
-
-    fun numeroAprobados(evaluacion: String): Int {
-        var aprobados = 0
-        when (evaluacion) {
-            "1" -> {
-                lisnotas1.filter {it.second >= 5}
-                aprobados = lisnotas1.size
-            }
-            "2" -> {
-                lisnotas2.filter {it.second >= 5}
-                aprobados = lisnotas2.size
-            }
-            "3" -> {
-                lisnotas3.filter {it.second >= 5}
-                aprobados = lisnotas3.size
-                }
-            else -> {
-                lisnotas4.filter {it.second >= 5}
-                aprobados = lisnotas1.size
-            }
-        }
-        return aprobados
+    var lisnotas = Array(4){FloatArray(maxAlumnos) }
+    fun matricularAlumno(alumno: Alumno) : Boolean{
+        var matriculado = false
+        try {
+            lisAlumnos[lisAlumnos.indexOf(lisAlumnos.first { it == null })] = alumno
+            lisnotas[0][lisAlumnos.indexOf(alumno)] = alumno.notas[0]
+            lisnotas[1][lisAlumnos.indexOf(alumno)] = alumno.notas[1]
+            lisnotas[2][lisAlumnos.indexOf(alumno)] = alumno.notas[2]
+            lisnotas[3][lisAlumnos.indexOf(alumno)] = alumno.notas[3]
+            matriculado = true
+        }catch (e:NoSuchElementException){println("No puedes meter más")}
+        return true
     }
 }
 
-class Alumno(val nombre: String, val apellidos: String, val nota1t: Int, val nota2t: Int, val nota3t: Int) {
+class Alumno(val id: Int,val nombre: String, val apellido1: String, val apellido2: String, val nota1t: Float, val nota2t: Float, val nota3t: Float) {
     var notas = arrayOf(nota1t, nota2t, nota3t, calculaEvaluacionFinal())
-    fun calculaEvaluacionFinal(): Int {
-        var notafinal = ((nota1t + nota2t + nota3t) / 3).toDouble()
-        return redondear(notafinal)
-    }
-
-    private fun redondear(num: Double): Int {
-        "%.0f".format(num)
-        return num.toInt()
+    private fun calculaEvaluacionFinal(): Float {
+        return ((nota1t + nota2t + nota3t) / 3)
     }
 }
 
 fun main() {
-    var modulo1 = Modulo(15)
-    var alumno1 = Alumno("Alejandro","González",6,8,4)
-    modulo1.anadirAlumno(alumno1)
-    var alumno2 = Alumno("Pepito","Grillo",6,3,8)
-    modulo1.anadirAlumno(alumno2)
-    println(modulo1.numeroAprobados("1"))
+    val modulo = Modulo(3)
+
+    val alumno1 = Alumno(1,"Pedro","Pacheco","Díaz",6f,5f,9f)
+    val alumno2 = Alumno(1,"Pedro","Pacheco","Díaz",6f,5f,9f)
+    val alumno3 = Alumno(1,"Pedro","Pacheco","Díaz",6f,5f,9f)
+    val alumno4 = Alumno(10,"Pedro","Pacheco","Díaz",6f,5f,9f)
+    modulo.matricularAlumno(alumno1)
+    modulo.matricularAlumno(alumno2)
+    modulo.matricularAlumno(alumno3)
+    modulo.matricularAlumno(alumno4)
 }
