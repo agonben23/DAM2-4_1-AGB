@@ -14,19 +14,32 @@ class Modulo(val maxAlumnos: Int = 20) {
         var matriculado = false
         try {
             lisAlumnos[lisAlumnos.indexOf(lisAlumnos.first { it == null })] = alumno
-            lisnotas[0][lisAlumnos.indexOf(alumno)] = alumno.notas[0]
-            lisnotas[1][lisAlumnos.indexOf(alumno)] = alumno.notas[1]
-            lisnotas[2][lisAlumnos.indexOf(alumno)] = alumno.notas[2]
-            lisnotas[3][lisAlumnos.indexOf(alumno)] = alumno.notas[3]
+            for(i in 0..3) {
+                lisnotas[i][lisAlumnos.indexOf(alumno)] = alumno.notas[i]
+            }
             matriculado = true
+            numAlumnosMat++
         }catch (e:NoSuchElementException){println("No puedes meter más")}
         return true
     }
 
-    fun listaNotas(evaluacion : String): ArrayList<Any>{
-        val lisNotas : ArrayList<Float> = ArrayList()
+    fun bajaAlumno(idAlumno:String): Boolean{
+        var eliminado = false
+        val indice = lisAlumnos.indexOf(lisAlumnos.first { it?.id.toString() == idAlumno})
+        val idAlumno = lisAlumnos[indice]?.id
+        lisAlumnos[indice] = null
+        for(i in 0..3) {
+            lisnotas[i][indice] = 0f
+        }
+        eliminado = true
+        numAlumnosMat--
+        return eliminado
+    }
+
+    fun listaNotas(evaluacion : String): ArrayList<Pair<String,Float>>{ //
+        val lisNotas : ArrayList<Any> = ArrayList()
         val lisAlumnos = lisAlumnos
-        val lisPairNotas = ArrayList<Any>()
+        val lisPairNotas = ArrayList<Pair<String,Float>>()
         when(evaluacion){
             EV_PRIMER -> lisnotas[0].forEach { lisNotas.add(it) }
             EV_SEGUN -> lisnotas[1].forEach { lisNotas.add(it) }
@@ -38,30 +51,99 @@ class Modulo(val maxAlumnos: Int = 20) {
         var i = 0
         do {
             val pair = Pair(lisAlumnos[i]?.id,lisNotas[i])
-            lisPairNotas.add(pair)
+            lisPairNotas.add(pair as Pair<String, Float>)
             i++
         }while (i != lisNotas.size)
         return lisPairNotas
     }
 
+    fun numeroAprobados(evaluacion: String): Int {
+        val lisNotas = listaNotas(evaluacion)
+        val lisNotasAprob = lisNotas.filter { it.second >= 5f }
+        return lisNotasAprob.size
+    }
+
+    fun notaMasBaja(evaluacion: String): Float {
+        val lisNotas = listaNotas(evaluacion)
+        lisNotas.removeAll { (it.first != "") && (it.second == 0f) }
+        lisNotas.sortBy { it.second }
+        return lisNotas[0].second
+    }
+
+    fun notaMasAlta(evaluacion: String): Float {
+        val lisNotas = listaNotas(evaluacion)
+        lisNotas.removeAll { (it.first != "") && (it.second == 0f) }
+        lisNotas.sortByDescending { it.second }
+        return lisNotas[0].second
+    }
+
+    fun notaMedia(evaluacion: String): Float {
+        val lisPairNotas = listaNotas(evaluacion)
+        var notas: Float = 0f
+        lisPairNotas.forEach { notas += it.second }
+        return notas / numAlumnosMat
+    }
+
+    fun hayAlumnosConDiez(evaluacion: String): Boolean {
+        val lisNotas = listaNotas(evaluacion)
+        lisNotas.removeAll { it.second != 10f }
+        return (lisNotas.size > 0)
+    }
+
+    fun hayAlumnosAprobados(evaluacion: String): Boolean {
+        val lisNotas = listaNotas(evaluacion)
+        lisNotas.removeAll { it.second < 5 }
+        return (lisNotas.size > 0)
+    }
+
+    fun primeraNotaNoAprobada(evaluacion:String): Float{
+        val lisNotas = listaNotas(evaluacion)
+        lisNotas.removeAll { it.second >= 5 }
+        // lisNotas.sortByDescending { it.second } Usar en caso de mayor nota suspensa
+        return lisNotas[0].second
+    }
+
+    fun listaNotasOrdenados(evaluacion:String): List<Pair<String,Float>>{
+        val lisNotas = listaNotas(evaluacion)
+        lisNotas.removeAll { (it.first != "") && (it.second == 0f) }
+        lisNotas.sortBy { it.second }
+        return lisNotas
+    }
+
 }
 
-class Alumno(val id: Int,val nombre: String, val apellido1: String, val apellido2: String, val nota1t: Float, val nota2t: Float, val nota3t: Float) {
+class Alumno(val id: String,val nombre: String, val apellido1: String, val apellido2: String, val nota1t: Float, val nota2t: Float, val nota3t: Float) {
     var notas = arrayOf(nota1t, nota2t, nota3t, calculaEvaluacionFinal())
-    private fun calculaEvaluacionFinal(): Float {
+    private fun calculaEvaluacionFinal(): Float { //2. Calcula la nota final del alumno
         return ((nota1t + nota2t + nota3t) / 3)
     }
 }
 
 fun main() {
-    val modulo = Modulo(3)
+    val modulo = Modulo(15) //1. Crea el módulo con un límite de alumnos
 
-    val alumno1 = Alumno(1,"Pedro","Pacheco","Díaz",6f,5f,9f)
-    val alumno2 = Alumno(2,"Lucas","Pacheco","Díaz",6f,5f,9f)
-    val alumno3 = Alumno(3,"Rafa","Pacheco","Díaz",6f,5f,9f)
-    val alumno4 = Alumno(10,"Pedro","Pacheco","Díaz",6f,5f,9f)
+    //1. Aquí se crean los alumnos
+    val alumno1 = Alumno("1","Pedro","Pacheco","Díaz",6f,5.3f,9.3f)
+    val alumno2 = Alumno("2","Lucas","Pacheco","Díaz",2.8f,6.5f,3.0f)
+    val alumno3 = Alumno("3","Rafa","Pacheco","Díaz",4f,4.8f,7.69f)
+    val alumno4 = Alumno("4","Pedro","Pacheco","Díaz",4.6f,4.8f,5.1f)
+    val alumno5 = Alumno("5","Pedro","Pacheco","Díaz",6f,5.3f,9.3f)
+    val alumno6 = Alumno("6","Lucas","Pacheco","Díaz",2.8f,6.5f,3.0f)
+    val alumno7 = Alumno("7","Rafa","Pacheco","Díaz",4f,4.8f,7.69f)
+    val alumno8 = Alumno("8","Pedro","Pacheco","Díaz",4.6f,4.8f,5.1f)
+    val alumno9 = Alumno("9","Pedro","Pacheco","Díaz",6f,5.3f,9.3f)
+    val alumno10 = Alumno("10","Lucas","Pacheco","Díaz",2.8f,6.5f,3.0f)
+    //1. Aquí se adjudican los alumnos al módulo
     modulo.matricularAlumno(alumno1)
     modulo.matricularAlumno(alumno2)
     modulo.matricularAlumno(alumno3)
-    println(modulo.listaNotas(""))
+    modulo.matricularAlumno(alumno4)
+    modulo.matricularAlumno(alumno5)
+    modulo.matricularAlumno(alumno6)
+    modulo.matricularAlumno(alumno7)
+    modulo.matricularAlumno(alumno8)
+    modulo.matricularAlumno(alumno9)
+    modulo.matricularAlumno(alumno10)
+    println(modulo.listaNotasOrdenados("1"))
+
 }
