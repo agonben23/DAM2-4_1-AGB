@@ -113,6 +113,9 @@ class Modulo(val maxAlumnos: Int = 20) {
 }
 
 class Alumno(val id: String,val nombre: String, val apellido1: String, val apellido2: String, val nota1t: Float, val nota2t: Float, val nota3t: Float) {
+    init {
+        require((nota1t in (0f..10f) && nota2t in (0f..10f) && nota3t in (0f..10f))){"Nota no válida para el alumno de id $id"}
+    }
     var notas = arrayOf(nota1t, nota2t, nota3t, calculaEvaluacionFinal())
     private fun calculaEvaluacionFinal(): Float { //2. Calcula la nota final del alumno
         return ((nota1t + nota2t + nota3t) / 3)
@@ -123,7 +126,7 @@ fun main() {
     val modulo = Modulo(15) //1. Crea el módulo con un límite de alumnos
 
     //1. Aquí se crean los alumnos
-    val alumno1 = Alumno("1","Pedro","Pacheco","Díaz",6f,5.3f,9.3f)
+    val alumno1 = Alumno("1","Pedro","Pacheco","Díaz",6.3f,5.3f,9.3f)
     val alumno2 = Alumno("2","Lucas","Pacheco","Díaz",2.8f,6.5f,3.0f)
     val alumno3 = Alumno("3","Rafa","Pacheco","Díaz",4f,4.8f,7.69f)
     val alumno4 = Alumno("4","Pedro","Pacheco","Díaz",4.6f,4.8f,5.1f)
