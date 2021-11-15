@@ -96,7 +96,7 @@ class Modulo(val maxAlumnos: Int = 20) {
         return (lisNotas.size > 0)
     }
 
-    fun primeraNotaNoAprobada(evaluacion:String): Float{ //10. Para un módulo, calcular la primera nota que no ha superado el 5 por evaluación, por defecto final
+    fun primeraNotaNoAprobada(evaluacion:String): Float{ //10. Para un módulo, calcular la primera nota (por orden de registro) que no ha superado el 5 por evaluación, por defecto final
         val lisNotas = listaNotas(evaluacion)
         lisNotas.removeAll { it.second >= 5 }
         // lisNotas.sortByDescending { it.second } Usar en caso de mayor nota suspensa
