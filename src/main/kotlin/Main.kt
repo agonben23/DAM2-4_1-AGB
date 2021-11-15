@@ -1,7 +1,7 @@
 class Modulo(val maxAlumnos: Int = 20) {
     var numAlumnosMat = 0
     var lisAlumnos= arrayOfNulls<Alumno>(maxAlumnos)
-    var lisnotas = Array(4){FloatArray(maxAlumnos) }
+    var lisnotas = Array(4){FloatArray(maxAlumnos)}
 
     companion object{
         const val EV_PRIMER="1"
@@ -10,7 +10,7 @@ class Modulo(val maxAlumnos: Int = 20) {
         const val EV_FINAl="4"
     }
 
-    fun matricularAlumno(alumno: Alumno) : Boolean{
+    fun matricularAlumno(alumno: Alumno) : Boolean{ //12. Poder matricular alumnos siempre que no se llegue al máximo de alumnos
         var matriculado = false
         try {
             lisAlumnos[lisAlumnos.indexOf(lisAlumnos.first { it == null })] = alumno
@@ -23,7 +23,7 @@ class Modulo(val maxAlumnos: Int = 20) {
         return true
     }
 
-    fun bajaAlumno(idAlumno:String): Boolean{
+    fun bajaAlumno(idAlumno:String): Boolean{ //13. Dar de baja alumnos
         var eliminado = false
         val indice = lisAlumnos.indexOf(lisAlumnos.first { it?.id.toString() == idAlumno})
         val idAlumno = lisAlumnos[indice]?.id
@@ -36,7 +36,7 @@ class Modulo(val maxAlumnos: Int = 20) {
         return eliminado
     }
 
-    fun listaNotas(evaluacion : String): ArrayList<Pair<String,Float>>{ //
+    fun listaNotas(evaluacion : String): ArrayList<Pair<String,Float>>{ //3. Obtener lista de alumnos, nota con las notas por evaluación, por defecto final.
         val lisNotas : ArrayList<Any> = ArrayList()
         val lisAlumnos = lisAlumnos
         val lisPairNotas = ArrayList<Pair<String,Float>>()
@@ -57,53 +57,53 @@ class Modulo(val maxAlumnos: Int = 20) {
         return lisPairNotas
     }
 
-    fun numeroAprobados(evaluacion: String): Int {
+    fun numeroAprobados(evaluacion: String): Int { //4.Para un módulo, calcular cuantos alumnos han aprobado por evaluación, por defecto final
         val lisNotas = listaNotas(evaluacion)
         val lisNotasAprob = lisNotas.filter { it.second >= 5f }
         return lisNotasAprob.size
     }
 
-    fun notaMasBaja(evaluacion: String): Float {
+    fun notaMasBaja(evaluacion: String): Float { //5. Para un módulo, calcular la nota más baja por evaluación, por defecto final
         val lisNotas = listaNotas(evaluacion)
         lisNotas.removeAll { (it.first != "") && (it.second == 0f) }
         lisNotas.sortBy { it.second }
         return lisNotas[0].second
     }
 
-    fun notaMasAlta(evaluacion: String): Float {
+    fun notaMasAlta(evaluacion: String): Float { //6. Para un módulo, calcular la nota más alta por evaluación, por defecto final
         val lisNotas = listaNotas(evaluacion)
         lisNotas.removeAll { (it.first != "") && (it.second == 0f) }
         lisNotas.sortByDescending { it.second }
         return lisNotas[0].second
     }
 
-    fun notaMedia(evaluacion: String): Float {
+    fun notaMedia(evaluacion: String): Float { //7. Para un módulo, calcular la nota media entre todos los alumnos por evaluación, por defecto final
         val lisPairNotas = listaNotas(evaluacion)
         var notas: Float = 0f
         lisPairNotas.forEach { notas += it.second }
         return notas / numAlumnosMat
     }
 
-    fun hayAlumnosConDiez(evaluacion: String): Boolean {
+    fun hayAlumnosConDiez(evaluacion: String): Boolean { //8. Para un módulo, calcular si alguno tiene un 10 por evaluación, por defecto final
         val lisNotas = listaNotas(evaluacion)
         lisNotas.removeAll { it.second != 10f }
         return (lisNotas.size > 0)
     }
 
-    fun hayAlumnosAprobados(evaluacion: String): Boolean {
+    fun hayAlumnosAprobados(evaluacion: String): Boolean { //9.Para un módulo, calcular si hay alumnos aprobados por evaluación, por defecto final
         val lisNotas = listaNotas(evaluacion)
         lisNotas.removeAll { it.second < 5 }
         return (lisNotas.size > 0)
     }
 
-    fun primeraNotaNoAprobada(evaluacion:String): Float{
+    fun primeraNotaNoAprobada(evaluacion:String): Float{ //10. Para un módulo, calcular la primera nota que no ha superado el 5 por evaluación, por defecto final
         val lisNotas = listaNotas(evaluacion)
         lisNotas.removeAll { it.second >= 5 }
         // lisNotas.sortByDescending { it.second } Usar en caso de mayor nota suspensa
         return lisNotas[0].second
     }
 
-    fun listaNotasOrdenados(evaluacion:String): List<Pair<String,Float>>{
+    fun listaNotasOrdenados(evaluacion:String): List<Pair<String,Float>>{ //11. Para un módulo, calcular si hay alumnos aprobados por evaluación, por defecto final
         val lisNotas = listaNotas(evaluacion)
         lisNotas.removeAll { (it.first != "") && (it.second == 0f) }
         lisNotas.sortBy { it.second }
